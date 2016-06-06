@@ -1,8 +1,12 @@
-import mraa
-import time
+import mraa, time
 
 class MOTO:
-    DIR = "FORWARD"
+    DIR_A = "NONE"
+    DIR_B = "NONE"
+    SPEED_A = 0.0
+    SPEED_B = 0.0
+    INVERSE = False
+
     pwmA = mraa.Pwm(20)
     pwmB = mraa.Pwm(14)
 
@@ -13,15 +17,16 @@ class MOTO:
     b2 = mraa.Gpio(36)
 
     sb = mraa.Gpio(47)
-    value = 0
 
-    def __init__(self, period = 5000):
+    def __init__(self, inverse = False, period = 5000):
+        self.INVERSE = inverse
+
         self.a1.dir(mraa.DIR_OUT)
         self.a2.dir(mraa.DIR_OUT)
         self.b1.dir(mraa.DIR_OUT)
         self.b2.dir(mraa.DIR_OUT)
         self.sb.dir(mraa.DIR_OUT)
- 
+
         self.a1.mode(mraa.MODE_STRONG)
         self.a2.mode(mraa.MODE_STRONG)
         self.b1.mode(mraa.MODE_STRONG)
@@ -36,28 +41,45 @@ class MOTO:
 
         self.pwmA.period_us(period)
         self.pwmA.enable(True)
-        self.pwmA.write(0.0)
+        self.pwmA.write(self.SPEED_A)
 
         self.pwmB.period_us(period)
         self.pwmB.enable(True)
-        self.pwmB.write(0.0)
+        self.pwmB.write(self.SPEED_B)
 
-    def direction(self, DIR): 
-        print "change direction to:" + DIR
-        self.DIR = DIR
-        forward = DIR == "FORWARD"
+    def direction(self, id, value):
+        forward = value == "FORWARD"
+        if self.INVERSE == True and id == "A":
+            forward = not forward
+
         d1 = int(forward)
         d2 = int(not forward)
 
         self.sb.write(1)
 
-        self.a1.write(d1)
-        self.a2.write(d2)
-        self.b1.write(d1)
-        self.b2.write(d2)
+        if id == "A":
+            if value != self.DIR_A:
+                self.DIR_A = value
+                self.a1.write(d1)
+                self.a2.write(d2)
+        else:
+            if value != self.DIR_B:
+                self.DIR_B = value
+                self.b1.write(d1)
+                self.b2.write(d2)
 
-    def speed(self, value):
-        self.pwmA.write(value)
-        self.pwmB.write(value)
-    
-        print "speed: " + str(value)
+
+    def speed(self, id, value):
+        if id == "A":
+            if value != self.SPEED_A:
+                self.SPEED_A = value
+                self.pwmA.write(value)
+        else:
+            if value != self.SPEED_B:
+                self.SPEED_B = value
+                self.pwmB.write(value)
+
+    def on(self, id, direction, speed):
+        #print "motor: "+id, "direction: " + direction, "speed: " + str(speed)
+        self.direction(id, direction)
+        self.speed(id, speed)
