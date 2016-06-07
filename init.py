@@ -37,25 +37,25 @@ while(1):
     try:
         max = 0.85
         imu.read_accel()
-        imu.read_mag()
-        imu.read_gyro()
+        #imu.read_mag()
+        #imu.read_gyro()
 
-        absy = math.fabs(imu.ay) - 0.2
-        speed = (absy)*1.4
+        absy = math.fabs(imu.ay)
+        speed = (absy)*1
 
-        if speed > 1:
-            speed = 1
+        if speed > .6:
+            speed = .6
 
         if absy > max or imu.az > 0:
             speed = 0
 
-        print "Accel Y: " + str(imu.ay) + '|| '+ str(speed)
-#        print "Mag: " + str(imu.mx) + ", " + str(imu.my) + ", " + str(imu.mz)
-        print "Accel: " + str(imu.ax) + ", " + str(imu.ay) + ", " + str(imu.az)
-        print "Gyro: " + str(imu.gx) + ", " + str(imu.gy) + ", " + str(imu.gz)
+        #print "Accel Y: " + str(imu.ay) + '|| '+ str(speed)
+        #print "Accel: " + str(imu.ax) + ", " + str(imu.ay) + ", " + str(imu.az)
+        #print "Mag: " + str(imu.mx) + ", " + str(imu.my) + ", " + str(imu.mz)
+        #print "Gyro: " + str(imu.gx) + ", " + str(imu.gy) + ", " + str(imu.gz)
 
-        pitchroll(imu.ax, imu.ay, imu.az)
-        heading(imu.mx, imu.my, imu.mz)
+        #pitchroll(imu.ax, imu.ay, imu.az)
+        #heading(imu.mx, imu.my, imu.mz)
 
 
         if imu.ay < 0:
@@ -63,10 +63,10 @@ while(1):
             motor.on("A", "FORWARD", speed)
             motor.on("B", "FORWARD", speed)
         else:
-            a =1
+            a = 1
             motor.on("A", "BACKWARD", speed)
             motor.on("B", "BACKWARD", speed)
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 
     except KeyboardInterrupt:
